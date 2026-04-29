@@ -25,6 +25,7 @@ def label_hotpotqa(record: dict, hotpotqa_row: dict) -> dict:
     supporting_facts = hotpotqa_row.get("supporting_facts", [])
     context = hotpotqa_row.get("context", {})
     question_type = hotpotqa_row.get("type", "")
+    reference_answer = hotpotqa_row.get("reference_answer", "")
 
     evidence = extract_evidence(supporting_facts, context)
     nli_result = classify(evidence, answer)
@@ -33,6 +34,7 @@ def label_hotpotqa(record: dict, hotpotqa_row: dict) -> dict:
         answer=answer,
         evidence=evidence,
         question_type=question_type,
+        reference=reference_answer,
     )
     is_hallucinated = hallucination_type not in ("supported", "abstained")
 

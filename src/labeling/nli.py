@@ -19,7 +19,7 @@ def _load_model() -> None:
         _model = _model.to("cuda")
 
 
-def classify(premise: str, hypothesis: str) -> Dict[str, float]:
+def _classify_one(premise: str, hypothesis: str) -> Dict[str, float]:
     _load_model()
 
     inputs = _tokenizer(
@@ -53,3 +53,13 @@ def classify(premise: str, hypothesis: str) -> Dict[str, float]:
         "prob_neutral": probs[neutral_idx].item(),
         "prob_contradiction": probs[contradiction_idx].item(),
     }
+
+
+def is_bidirectional_entailment(text_a: str, text_b: str) -> bool:
+    forward = _classify_one(text_a, text_b)
+    backward = _classify_one(text_b, text_a)
+    return forward["nli_label"] == "entailment" and backward["nli_label"] == "entailment"
+
+
+def classify(premise: str, hypothesis: str) -> Dict[str, float]:
+    return _classify_one(premise, hypothesis)

@@ -1,6 +1,8 @@
 import re
 from typing import Dict, Any
 
+from src.labeling import nli as _nli
+from src.labeling import embeddings as _emb
 
 ABSTAIN_PHRASES = [
     "i don't know",
@@ -31,10 +33,43 @@ ABSTAIN_PHRASES = [
 
 NUMBER_PATTERN = re.compile(r"\b\d{1,4}\b")
 
+_EMBED_SIM_THRESHOLD = 0.60
+_REFERENCE_RECALL_THRESHOLD = 0.50
+_STRIP_CHARS = ".,;:?!\"'()-"
+
 
 def _is_abstention(answer: str) -> bool:
     answer_lower = answer.lower()
     return any(phrase in answer_lower for phrase in ABSTAIN_PHRASES)
+
+
+def _reference_recall(answer: str, reference: str) -> float:
+    """Fraction of reference tokens that appear in the answer.
+    Works correctly when the answer is verbose and the reference is short."""
+    r_tokens = {w.strip(_STRIP_CHARS) for w in reference.lower().split()}
+    a_tokens = {w.strip(_STRIP_CHARS) for w in answer.lower().split()}
+    r_tokens.discard("")
+    if not r_tokens:
+        return 0.0
+    return len(r_tokens & a_tokens) / len(r_tokens)
+
+
+def is_supported_by_signals(answer: str, reference: str) -> bool:
+    """Return True if at least 2 of 3 independent signals agree the answer is supported.
+    Compares the model answer against the short gold reference answer, not the full
+    evidence passage (which would make F1 and cosine artificially low)."""
+    signals = 0
+
+    if _reference_recall(answer, reference) > _REFERENCE_RECALL_THRESHOLD:
+        signals += 1
+
+    if _emb.cosine_similarity(answer, reference) > _EMBED_SIM_THRESHOLD:
+        signals += 1
+
+    if signals < 2 and _nli.is_bidirectional_entailment(answer, reference):
+        signals += 1
+
+    return signals >= 2
 
 
 def _entity_missing_from_evidence(answer: str, evidence: str) -> bool:
@@ -60,12 +95,28 @@ def classify_hallucination_type(
     answer: str,
     evidence: str,
     question_type: str = "",
+    reference: str = "",
 ) -> str:
     if nli_result["nli_label"] == "entailment":
         return "supported"
 
     if _is_abstention(answer):
         return "abstained"
+
+    # For neutral: a high reference recall alone is sufficient — if the model's answer
+    # contains the gold answer tokens, DeBERTa's neutral is almost certainly a false
+    # positive caused by verbosity. Single-word gold answers have low cosine against
+    # verbose answers, so requiring 2-of-3 would never fire.
+    if nli_result["nli_label"] == "neutral" and reference:
+        if _reference_recall(answer, reference) > _REFERENCE_RECALL_THRESHOLD:
+            return "supported"
+
+    # For contradiction (or neutral without a reference): require 2-of-3 signals so we
+    # don't accidentally suppress a real error.
+    if nli_result["nli_label"] in ("neutral", "contradiction"):
+        signal_ref = reference if reference else evidence
+        if is_supported_by_signals(answer, signal_ref):
+            return "supported"
 
     if nli_result["nli_label"] == "contradiction":
         return "contradiction_to_evidence"

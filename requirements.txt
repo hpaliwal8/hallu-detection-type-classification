@@ -7,3 +7,4 @@ transformers>=4.40
 accelerate>=0.26
 seaborn>=0.13
 matplotlib>=3.7
+sentence-transformers>=3.0
