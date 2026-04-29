@@ -62,6 +62,11 @@ contradiction_to_evidence: 296 → 282 (−14)
 
 ---
 
+
+Completion comments:
+Implemented signal-based override; in practice the input cleaning fix accounted for most observed gains.
+
+
 ### Phase 2 — Score-based type classification
 
 **Goal:** Pick the most confident type, not the first one that fires.
