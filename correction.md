@@ -39,7 +39,7 @@ Without manual validation, the FP rate is unknown. Cannot make defensible claims
 
 **Changes to `src/labeling/heuristics.py`:**
 Add `is_supported_by_signals` check that runs before type classification:
-- Token F1 between answer and reference > 0.50 → supported
+- Recall between answer and reference > 0.50 → supported
 - Embedding cosine similarity > 0.60 → supported
 - Bidirectional NLI both entailment → supported
 

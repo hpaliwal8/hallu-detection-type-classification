@@ -72,22 +72,30 @@ def is_supported_by_signals(answer: str, reference: str) -> bool:
     return signals >= 2
 
 
-def _entity_missing_from_evidence(answer: str, evidence: str) -> bool:
+def _entity_score(answer: str, evidence: str) -> float:
+    """Fraction of capitalized words in the answer that are absent from the evidence."""
     evidence_lower = evidence.lower()
     words = answer.split()
-    capitalized = [w.strip(".,;:?!\"'") for w in words if w and w[0].isupper()]
+    capitalized = [w.strip(_STRIP_CHARS) for w in words if w and w[0].isupper()]
     if not capitalized:
-        return False
+        return 0.0
     missing = [w for w in capitalized if w.lower() not in evidence_lower]
-    return len(missing) > len(capitalized) // 2
+    return len(missing) / len(capitalized)
 
 
-def _attribute_mismatch(answer: str, evidence: str) -> bool:
+def _attribute_score(answer: str, evidence: str) -> float:
+    """Fraction of numbers in the answer that do not appear in the evidence."""
     answer_numbers = set(NUMBER_PATTERN.findall(answer))
-    evidence_numbers = set(NUMBER_PATTERN.findall(evidence))
     if not answer_numbers:
-        return False
-    return bool(answer_numbers - evidence_numbers)
+        return 0.0
+    evidence_numbers = set(NUMBER_PATTERN.findall(evidence))
+    missing = answer_numbers - evidence_numbers
+    return len(missing) / len(answer_numbers)
+
+
+def _multihop_score(question_type: str) -> float:
+    """Fixed prior for multi-hop questions. Phase 5 will replace this with overlap signal."""
+    return 0.5 if question_type in ("bridge", "comparison") else 0.0
 
 
 def classify_hallucination_type(
@@ -118,16 +126,14 @@ def classify_hallucination_type(
         if is_supported_by_signals(answer, signal_ref):
             return "supported"
 
-    if nli_result["nli_label"] == "contradiction":
-        return "contradiction_to_evidence"
+    scores = {
+        "contradiction_to_evidence": nli_result["prob_contradiction"],
+        "attribute_error":           _attribute_score(answer, evidence),
+        "entity_error":              _entity_score(answer, evidence),
+        "multi_hop_reasoning_error": _multihop_score(question_type),
+    }
 
-    if _attribute_mismatch(answer, evidence):
-        return "attribute_error"
-
-    if _entity_missing_from_evidence(answer, evidence):
-        return "entity_error"
-
-    if question_type in ("bridge", "comparison"):
-        return "multi_hop_reasoning_error"
-
-    return "unsupported_inference"
+    best_type = max(scores, key=scores.get)
+    if scores[best_type] < 0.5:
+        return "unsupported_inference"
+    return best_type
