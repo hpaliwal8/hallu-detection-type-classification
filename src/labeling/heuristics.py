@@ -77,14 +77,32 @@ def _entity_score(answer: str, evidence: str) -> float:
     return _ent.entity_score(answer, evidence)
 
 
+def _sentences(text: str):
+    return re.split(r'(?<=[.!?])\s+', text)
+
+
 def _attribute_score(answer: str, evidence: str) -> float:
-    """Fraction of numbers in the answer that do not appear in the evidence."""
-    answer_numbers = set(NUMBER_PATTERN.findall(answer))
-    if not answer_numbers:
+    """Fraction of numbers — in answer sentences containing a correct entity — that are
+    absent from the evidence. Returns 0.0 when the entity itself is wrong so that
+    entity_error wins instead of attribute_error."""
+    # Only consider numbers near entities that are confirmed present in evidence.
+    answer_entities = _ent.extract_named_entities(answer)
+    correct_entities = [e for e in answer_entities if e.lower() in evidence.lower()]
+    if not correct_entities:
         return 0.0
+
+    # Collect numbers from answer sentences that contain at least one correct entity.
+    relevant_numbers = set()
+    for sent in _sentences(answer):
+        if any(e.lower() in sent.lower() for e in correct_entities):
+            relevant_numbers |= set(NUMBER_PATTERN.findall(sent))
+
+    if not relevant_numbers:
+        return 0.0
+
     evidence_numbers = set(NUMBER_PATTERN.findall(evidence))
-    missing = answer_numbers - evidence_numbers
-    return len(missing) / len(answer_numbers)
+    missing = relevant_numbers - evidence_numbers
+    return len(missing) / len(relevant_numbers)
 
 
 def _multihop_score(question_type: str) -> float:
