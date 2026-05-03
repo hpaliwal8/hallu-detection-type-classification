@@ -105,9 +105,35 @@ def _attribute_score(answer: str, evidence: str) -> float:
     return len(missing) / len(relevant_numbers)
 
 
-def _multihop_score(question_type: str) -> float:
-    """Fixed prior for multi-hop questions. Phase 5 will replace this with overlap signal."""
-    return 0.5 if question_type in ("bridge", "comparison") else 0.0
+def _tokenize(text: str) -> set:
+    return {w.strip(_STRIP_CHARS) for w in text.lower().split()} - {""}
+
+
+def _max_sentence_overlap(answer: str, evidence: str) -> float:
+    """Max Jaccard token overlap between the answer and any single evidence sentence."""
+    a_tokens = _tokenize(answer)
+    if not a_tokens:
+        return 0.0
+    best = 0.0
+    for sent in _sentences(evidence):
+        e_tokens = _tokenize(sent)
+        if not e_tokens:
+            continue
+        overlap = len(a_tokens & e_tokens) / len(a_tokens | e_tokens)
+        if overlap > best:
+            best = overlap
+    return best
+
+
+def _multihop_score(answer: str, evidence: str, question_type: str) -> float:
+    """Score is gated on evidence engagement: the model must overlap with at least one
+    evidence sentence to be labeled multi_hop rather than unsupported_inference."""
+    if question_type not in ("bridge", "comparison"):
+        return 0.0
+    overlap = _max_sentence_overlap(answer, evidence)
+    if overlap < 0.2:
+        return 0.0
+    return min(overlap / 0.4, 1.0) * 0.5
 
 
 def classify_hallucination_type(
@@ -142,7 +168,7 @@ def classify_hallucination_type(
         "contradiction_to_evidence": nli_result["prob_contradiction"],
         "attribute_error":           _attribute_score(answer, evidence),
         "entity_error":              _entity_score(answer, evidence),
-        "multi_hop_reasoning_error": _multihop_score(question_type),
+        "multi_hop_reasoning_error": _multihop_score(answer, evidence, question_type),
     }
 
     best_type = max(scores, key=scores.get)
