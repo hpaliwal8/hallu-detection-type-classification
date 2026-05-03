@@ -3,6 +3,7 @@ from typing import Dict, Any
 
 from src.labeling import nli as _nli
 from src.labeling import embeddings as _emb
+from src.labeling import entities as _ent
 
 ABSTAIN_PHRASES = [
     "i don't know",
@@ -73,14 +74,7 @@ def is_supported_by_signals(answer: str, reference: str) -> bool:
 
 
 def _entity_score(answer: str, evidence: str) -> float:
-    """Fraction of capitalized words in the answer that are absent from the evidence."""
-    evidence_lower = evidence.lower()
-    words = answer.split()
-    capitalized = [w.strip(_STRIP_CHARS) for w in words if w and w[0].isupper()]
-    if not capitalized:
-        return 0.0
-    missing = [w for w in capitalized if w.lower() not in evidence_lower]
-    return len(missing) / len(capitalized)
+    return _ent.entity_score(answer, evidence)
 
 
 def _attribute_score(answer: str, evidence: str) -> float:
