@@ -98,3 +98,22 @@ Use a **DeBERTa‑MNLI** cross‑encoder as an NLI judge.
 - Hallucination type distribution charts
 - Prompt‑sensitivity comparisons
 - Error analysis examples
+
+
+Per model - per prompting mode hallucination type classification:
+
+EOF
+Model                     Prompt      Total   Hall% | Type breakdown (% of hallucinations)
+--------------------------------------------------------------------------------------------------------------
+llama-3.1-8b-instruct     abstain       500    6.0% | multi_hop_reasoning_error=36.7%, contradiction_to_evidence=33.3%, entity_error=16.7%, attribute_error=13.3%
+llama-3.1-8b-instruct     plain         500   40.2% | contradiction_to_evidence=60.7%, multi_hop_reasoning_error=21.4%, attribute_error=10.4%, entity_error=7.5%
+llama-3.1-8b-instruct     reasoning     500   58.0% | attribute_error=40.7%, contradiction_to_evidence=29.0%, multi_hop_reasoning_error=24.1%, entity_error=6.2%
+mistral-7b-instruct       abstain       500   15.8% | contradiction_to_evidence=38.0%, multi_hop_reasoning_error=32.9%, attribute_error=17.7%, entity_error=11.4%
+mistral-7b-instruct       plain         500   92.4% | contradiction_to_evidence=48.3%, multi_hop_reasoning_error=23.2%, attribute_error=18.6%, entity_error=10.0%
+mistral-7b-instruct       reasoning     500   75.4% | attribute_error=57.0%, multi_hop_reasoning_error=26.5%, contradiction_to_evidence=11.4%, entity_error=5.0%
+phi-4-mini-instruct       abstain       500    3.0% | contradiction_to_evidence=73.3%, entity_error=13.3%, multi_hop_reasoning_error=6.7%, attribute_error=6.7%
+phi-4-mini-instruct       plain         500   87.6% | contradiction_to_evidence=68.0%, multi_hop_reasoning_error=14.6%, attribute_error=11.4%, entity_error=5.9%
+phi-4-mini-instruct       reasoning     500   81.8% | contradiction_to_evidence=44.0%, attribute_error=29.3%, multi_hop_reasoning_error=19.6%, entity_error=7.1%
+qwen2.5-7b-instruct       abstain       500    4.0% | contradiction_to_evidence=45.0%, multi_hop_reasoning_error=40.0%, attribute_error=10.0%, entity_error=5.0%
+qwen2.5-7b-instruct       plain         500   91.0% | contradiction_to_evidence=48.1%, attribute_error=28.1%, multi_hop_reasoning_error=15.6%, entity_error=8.1%
+qwen2.5-7b-instruct       reasoning     500   74.4% | attribute_error=91.7%, contradiction_to_evidence=8.1%, multi_hop_reasoning_error=0.3%
