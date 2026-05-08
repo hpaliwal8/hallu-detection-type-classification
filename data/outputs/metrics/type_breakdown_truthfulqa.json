@@ -1,0 +1,182 @@
+[
+  {
+    "model_id": "llama-3.1-8b-instruct",
+    "prompt_id": "abstain",
+    "total": 120,
+    "hallucinated": 14,
+    "hallucination_rate": 0.1167,
+    "type_breakdown_pct": {
+      "unsupported_inference": 78.6,
+      "contradiction_to_evidence": 21.4
+    },
+    "type_counts": {
+      "unsupported_inference": 11,
+      "contradiction_to_evidence": 3
+    }
+  },
+  {
+    "model_id": "llama-3.1-8b-instruct",
+    "prompt_id": "plain",
+    "total": 120,
+    "hallucinated": 110,
+    "hallucination_rate": 0.9167,
+    "type_breakdown_pct": {
+      "unsupported_inference": 70.9,
+      "contradiction_to_evidence": 29.1
+    },
+    "type_counts": {
+      "unsupported_inference": 78,
+      "contradiction_to_evidence": 32
+    }
+  },
+  {
+    "model_id": "llama-3.1-8b-instruct",
+    "prompt_id": "reasoning",
+    "total": 120,
+    "hallucinated": 96,
+    "hallucination_rate": 0.8,
+    "type_breakdown_pct": {
+      "unsupported_inference": 86.5,
+      "contradiction_to_evidence": 13.5
+    },
+    "type_counts": {
+      "unsupported_inference": 83,
+      "contradiction_to_evidence": 13
+    }
+  },
+  {
+    "model_id": "mistral-7b-instruct",
+    "prompt_id": "abstain",
+    "total": 120,
+    "hallucinated": 26,
+    "hallucination_rate": 0.2167,
+    "type_breakdown_pct": {
+      "unsupported_inference": 84.6,
+      "contradiction_to_evidence": 15.4
+    },
+    "type_counts": {
+      "unsupported_inference": 22,
+      "contradiction_to_evidence": 4
+    }
+  },
+  {
+    "model_id": "mistral-7b-instruct",
+    "prompt_id": "plain",
+    "total": 120,
+    "hallucinated": 115,
+    "hallucination_rate": 0.9583,
+    "type_breakdown_pct": {
+      "unsupported_inference": 89.6,
+      "contradiction_to_evidence": 10.4
+    },
+    "type_counts": {
+      "unsupported_inference": 103,
+      "contradiction_to_evidence": 12
+    }
+  },
+  {
+    "model_id": "mistral-7b-instruct",
+    "prompt_id": "reasoning",
+    "total": 120,
+    "hallucinated": 91,
+    "hallucination_rate": 0.7583,
+    "type_breakdown_pct": {
+      "unsupported_inference": 96.7,
+      "contradiction_to_evidence": 3.3
+    },
+    "type_counts": {
+      "unsupported_inference": 88,
+      "contradiction_to_evidence": 3
+    }
+  },
+  {
+    "model_id": "phi-4-mini-instruct",
+    "prompt_id": "abstain",
+    "total": 120,
+    "hallucinated": 5,
+    "hallucination_rate": 0.0417,
+    "type_breakdown_pct": {
+      "unsupported_inference": 60.0,
+      "contradiction_to_evidence": 40.0
+    },
+    "type_counts": {
+      "contradiction_to_evidence": 2,
+      "unsupported_inference": 3
+    }
+  },
+  {
+    "model_id": "phi-4-mini-instruct",
+    "prompt_id": "plain",
+    "total": 120,
+    "hallucinated": 112,
+    "hallucination_rate": 0.9333,
+    "type_breakdown_pct": {
+      "unsupported_inference": 73.2,
+      "contradiction_to_evidence": 26.8
+    },
+    "type_counts": {
+      "unsupported_inference": 82,
+      "contradiction_to_evidence": 30
+    }
+  },
+  {
+    "model_id": "phi-4-mini-instruct",
+    "prompt_id": "reasoning",
+    "total": 120,
+    "hallucinated": 94,
+    "hallucination_rate": 0.7833,
+    "type_breakdown_pct": {
+      "unsupported_inference": 85.1,
+      "contradiction_to_evidence": 14.9
+    },
+    "type_counts": {
+      "unsupported_inference": 80,
+      "contradiction_to_evidence": 14
+    }
+  },
+  {
+    "model_id": "qwen2.5-7b-instruct",
+    "prompt_id": "abstain",
+    "total": 120,
+    "hallucinated": 34,
+    "hallucination_rate": 0.2833,
+    "type_breakdown_pct": {
+      "unsupported_inference": 82.4,
+      "contradiction_to_evidence": 17.6
+    },
+    "type_counts": {
+      "unsupported_inference": 28,
+      "contradiction_to_evidence": 6
+    }
+  },
+  {
+    "model_id": "qwen2.5-7b-instruct",
+    "prompt_id": "plain",
+    "total": 120,
+    "hallucinated": 105,
+    "hallucination_rate": 0.875,
+    "type_breakdown_pct": {
+      "unsupported_inference": 88.6,
+      "contradiction_to_evidence": 11.4
+    },
+    "type_counts": {
+      "unsupported_inference": 93,
+      "contradiction_to_evidence": 12
+    }
+  },
+  {
+    "model_id": "qwen2.5-7b-instruct",
+    "prompt_id": "reasoning",
+    "total": 120,
+    "hallucinated": 90,
+    "hallucination_rate": 0.75,
+    "type_breakdown_pct": {
+      "unsupported_inference": 96.7,
+      "contradiction_to_evidence": 3.3
+    },
+    "type_counts": {
+      "unsupported_inference": 87,
+      "contradiction_to_evidence": 3
+    }
+  }
+]

@@ -102,7 +102,7 @@ Use a **DeBERTa‑MNLI** cross‑encoder as an NLI judge.
 
 Per model - per prompting mode hallucination type classification:
 
-EOF
+For HotpotQA:
 Model                     Prompt      Total   Hall% | Type breakdown (% of hallucinations)
 --------------------------------------------------------------------------------------------------------------
 llama-3.1-8b-instruct     abstain       500    6.0% | multi_hop_reasoning_error=36.7%, contradiction_to_evidence=33.3%, entity_error=16.7%, attribute_error=13.3%
@@ -117,3 +117,20 @@ phi-4-mini-instruct       reasoning     500   81.8% | contradiction_to_evidence=
 qwen2.5-7b-instruct       abstain       500    4.0% | contradiction_to_evidence=45.0%, multi_hop_reasoning_error=40.0%, attribute_error=10.0%, entity_error=5.0%
 qwen2.5-7b-instruct       plain         500   91.0% | contradiction_to_evidence=48.1%, attribute_error=28.1%, multi_hop_reasoning_error=15.6%, entity_error=8.1%
 qwen2.5-7b-instruct       reasoning     500   74.4% | attribute_error=91.7%, contradiction_to_evidence=8.1%, multi_hop_reasoning_error=0.3%
+
+TruthfulQA
+
+Model                     Prompt      Total   Hall% | Type breakdown (% of hallucinations)
+--------------------------------------------------------------------------------------------------------------
+llama-3.1-8b-instruct     abstain       120   11.7% | unsupported_inference=78.6%, contradiction_to_evidence=21.4%
+llama-3.1-8b-instruct     plain         120   91.7% | unsupported_inference=70.9%, contradiction_to_evidence=29.1%
+llama-3.1-8b-instruct     reasoning     120   80.0% | unsupported_inference=86.5%, contradiction_to_evidence=13.5%
+mistral-7b-instruct       abstain       120   21.7% | unsupported_inference=84.6%, contradiction_to_evidence=15.4%
+mistral-7b-instruct       plain         120   95.8% | unsupported_inference=89.6%, contradiction_to_evidence=10.4%
+mistral-7b-instruct       reasoning     120   75.8% | unsupported_inference=96.7%, contradiction_to_evidence=3.3%
+phi-4-mini-instruct       abstain       120    4.2% | unsupported_inference=60.0%, contradiction_to_evidence=40.0%
+phi-4-mini-instruct       plain         120   93.3% | unsupported_inference=73.2%, contradiction_to_evidence=26.8%
+phi-4-mini-instruct       reasoning     120   78.3% | unsupported_inference=85.1%, contradiction_to_evidence=14.9%
+qwen2.5-7b-instruct       abstain       120   28.3% | unsupported_inference=82.4%, contradiction_to_evidence=17.6%
+qwen2.5-7b-instruct       plain         120   87.5% | unsupported_inference=88.6%, contradiction_to_evidence=11.4%
+qwen2.5-7b-instruct       reasoning     120   75.0% | unsupported_inference=96.7%, contradiction_to_evidence=3.3%

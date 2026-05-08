@@ -1,0 +1,228 @@
+[
+  {
+    "model_id": "llama-3.1-8b-instruct",
+    "prompt_id": "abstain",
+    "total": 500,
+    "hallucinated": 30,
+    "hallucination_rate": 0.06,
+    "type_breakdown_pct": {
+      "multi_hop_reasoning_error": 36.7,
+      "contradiction_to_evidence": 33.3,
+      "entity_error": 16.7,
+      "attribute_error": 13.3
+    },
+    "type_counts": {
+      "multi_hop_reasoning_error": 11,
+      "attribute_error": 4,
+      "entity_error": 5,
+      "contradiction_to_evidence": 10
+    }
+  },
+  {
+    "model_id": "llama-3.1-8b-instruct",
+    "prompt_id": "plain",
+    "total": 500,
+    "hallucinated": 201,
+    "hallucination_rate": 0.402,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 60.7,
+      "multi_hop_reasoning_error": 21.4,
+      "attribute_error": 10.4,
+      "entity_error": 7.5
+    },
+    "type_counts": {
+      "contradiction_to_evidence": 122,
+      "attribute_error": 21,
+      "multi_hop_reasoning_error": 43,
+      "entity_error": 15
+    }
+  },
+  {
+    "model_id": "llama-3.1-8b-instruct",
+    "prompt_id": "reasoning",
+    "total": 500,
+    "hallucinated": 290,
+    "hallucination_rate": 0.58,
+    "type_breakdown_pct": {
+      "attribute_error": 40.7,
+      "contradiction_to_evidence": 29.0,
+      "multi_hop_reasoning_error": 24.1,
+      "entity_error": 6.2
+    },
+    "type_counts": {
+      "attribute_error": 118,
+      "contradiction_to_evidence": 84,
+      "multi_hop_reasoning_error": 70,
+      "entity_error": 18
+    }
+  },
+  {
+    "model_id": "mistral-7b-instruct",
+    "prompt_id": "abstain",
+    "total": 500,
+    "hallucinated": 79,
+    "hallucination_rate": 0.158,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 38.0,
+      "multi_hop_reasoning_error": 32.9,
+      "attribute_error": 17.7,
+      "entity_error": 11.4
+    },
+    "type_counts": {
+      "attribute_error": 14,
+      "contradiction_to_evidence": 30,
+      "multi_hop_reasoning_error": 26,
+      "entity_error": 9
+    }
+  },
+  {
+    "model_id": "mistral-7b-instruct",
+    "prompt_id": "plain",
+    "total": 500,
+    "hallucinated": 462,
+    "hallucination_rate": 0.924,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 48.3,
+      "multi_hop_reasoning_error": 23.2,
+      "attribute_error": 18.6,
+      "entity_error": 10.0
+    },
+    "type_counts": {
+      "attribute_error": 86,
+      "entity_error": 46,
+      "multi_hop_reasoning_error": 107,
+      "contradiction_to_evidence": 223
+    }
+  },
+  {
+    "model_id": "mistral-7b-instruct",
+    "prompt_id": "reasoning",
+    "total": 500,
+    "hallucinated": 377,
+    "hallucination_rate": 0.754,
+    "type_breakdown_pct": {
+      "attribute_error": 57.0,
+      "multi_hop_reasoning_error": 26.5,
+      "contradiction_to_evidence": 11.4,
+      "entity_error": 5.0
+    },
+    "type_counts": {
+      "attribute_error": 215,
+      "multi_hop_reasoning_error": 100,
+      "contradiction_to_evidence": 43,
+      "entity_error": 19
+    }
+  },
+  {
+    "model_id": "phi-4-mini-instruct",
+    "prompt_id": "abstain",
+    "total": 500,
+    "hallucinated": 15,
+    "hallucination_rate": 0.03,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 73.3,
+      "entity_error": 13.3,
+      "multi_hop_reasoning_error": 6.7,
+      "attribute_error": 6.7
+    },
+    "type_counts": {
+      "contradiction_to_evidence": 11,
+      "multi_hop_reasoning_error": 1,
+      "entity_error": 2,
+      "attribute_error": 1
+    }
+  },
+  {
+    "model_id": "phi-4-mini-instruct",
+    "prompt_id": "plain",
+    "total": 500,
+    "hallucinated": 438,
+    "hallucination_rate": 0.876,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 68.0,
+      "multi_hop_reasoning_error": 14.6,
+      "attribute_error": 11.4,
+      "entity_error": 5.9
+    },
+    "type_counts": {
+      "contradiction_to_evidence": 298,
+      "attribute_error": 50,
+      "multi_hop_reasoning_error": 64,
+      "entity_error": 26
+    }
+  },
+  {
+    "model_id": "phi-4-mini-instruct",
+    "prompt_id": "reasoning",
+    "total": 500,
+    "hallucinated": 409,
+    "hallucination_rate": 0.818,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 44.0,
+      "attribute_error": 29.3,
+      "multi_hop_reasoning_error": 19.6,
+      "entity_error": 7.1
+    },
+    "type_counts": {
+      "attribute_error": 120,
+      "contradiction_to_evidence": 180,
+      "entity_error": 29,
+      "multi_hop_reasoning_error": 80
+    }
+  },
+  {
+    "model_id": "qwen2.5-7b-instruct",
+    "prompt_id": "abstain",
+    "total": 500,
+    "hallucinated": 20,
+    "hallucination_rate": 0.04,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 45.0,
+      "multi_hop_reasoning_error": 40.0,
+      "attribute_error": 10.0,
+      "entity_error": 5.0
+    },
+    "type_counts": {
+      "multi_hop_reasoning_error": 8,
+      "contradiction_to_evidence": 9,
+      "entity_error": 1,
+      "attribute_error": 2
+    }
+  },
+  {
+    "model_id": "qwen2.5-7b-instruct",
+    "prompt_id": "plain",
+    "total": 500,
+    "hallucinated": 455,
+    "hallucination_rate": 0.91,
+    "type_breakdown_pct": {
+      "contradiction_to_evidence": 48.1,
+      "attribute_error": 28.1,
+      "multi_hop_reasoning_error": 15.6,
+      "entity_error": 8.1
+    },
+    "type_counts": {
+      "multi_hop_reasoning_error": 71,
+      "contradiction_to_evidence": 219,
+      "attribute_error": 128,
+      "entity_error": 37
+    }
+  },
+  {
+    "model_id": "qwen2.5-7b-instruct",
+    "prompt_id": "reasoning",
+    "total": 500,
+    "hallucinated": 372,
+    "hallucination_rate": 0.744,
+    "type_breakdown_pct": {
+      "attribute_error": 91.7,
+      "contradiction_to_evidence": 8.1,
+      "multi_hop_reasoning_error": 0.3
+    },
+    "type_counts": {
+      "contradiction_to_evidence": 30,
+      "attribute_error": 341,
+      "multi_hop_reasoning_error": 1
+    }
+  }
+]
