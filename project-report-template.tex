@@ -11,11 +11,20 @@
 \setlength{\emergencystretch}{3em}
 \sloppy
 
+% Underline-style emphasis: \emph{...} now renders as underlined text.
+% normalem preserves italics for \textit{} and \em elsewhere in the doc.
+\usepackage[normalem]{ulem}
+\renewcommand{\emph}[1]{\uline{#1}}
+
 \DeclareUrlCommand\code{%
   \urlstyle{tt}%
   \def\UrlBreaks{\do\_\do\.\do\/\do\(\do\)\do\-}%
   \def\UrlBigBreaks{\do\_\do\.\do\/}%
 }
+
+% Taxonomy / classification label macro --- italics for conceptual category names.
+% Use \lbl{contradiction to evidence}, NOT \texttt{contradiction\_to\_evidence}.
+\newcommand{\lbl}[1]{\textit{#1}}
 
 \newcommand\BibTeX{B{\sc ib}\TeX}
 
@@ -37,7 +46,7 @@
 \maketitle
 
 \begin{abstract}
-We present a comparative study of hallucination behavior in four open-weight instruction-tuned LLMs (Phi-4-mini, Mistral-7B, Qwen2.5-7B, Llama-3.1-8B) on HotpotQA and TruthfulQA under three prompt variants. Our contribution is a reproducible labeling pipeline that combines a DeBERTa-MNLI judge with score-based heuristics to assign each answer one of seven taxonomy labels (supported, abstained, contradiction\_to\_evidence, entity\_error, attribute\_error, multi\_hop\_reasoning\_error, unsupported\_inference). A multi-signal supported-override rescues verbose-but-correct answers, and a cross-record pass flags \texttt{overconfident\_abstention\_failure}. Across 7{,}440 labeled records we find: (i) three of four models hallucinate at near-identical aggregate rates (87--92\%) on HotpotQA plain, while Llama-3.1 stands out at 40\%; (ii) prompt sensitivity is sharply non-uniform---the same reasoning prompt reduces Qwen/Mistral hallucinations by $\sim$17 points each but \emph{increases} Llama-3.1's by 17.8 points; (iii) under reasoning prompts, the dominant error type shifts from \texttt{contradiction\_to\_evidence} to \texttt{attribute\_error} (reaching 91.7\% for Qwen), suggesting reasoning trades contradictions for embedded numerical errors; (iv) on TruthfulQA, all four models converge near 83\% under reasoning, indicating misconception-style questions defeat prompt-based mitigation uniformly. We argue that LLM evaluation should report fine-grained type distributions and that prompt-level mitigation must be model-conditioned.
+We present a comparative study of hallucination behavior in four open-weight instruction-tuned LLMs (Phi-4-mini, Mistral-7B, Qwen2.5-7B, Llama-3.1-8B) on HotpotQA and TruthfulQA under three prompt variants. Our contribution is a reproducible labeling pipeline that combines a DeBERTa-MNLI judge with score-based heuristics to assign each answer one of seven taxonomy labels (\lbl{supported}, \lbl{abstained}, \lbl{contradiction to evidence}, \lbl{entity error}, \lbl{attribute error}, \lbl{multi-hop reasoning error}, \lbl{unsupported inference}). A multi-signal supported-override rescues verbose-but-correct answers, and a cross-record pass flags \lbl{overconfident abstention failure}. Across 7{,}440 labeled records we find: (i) three of four models hallucinate at near-identical aggregate rates (87--92\%) on HotpotQA plain, while Llama-3.1 stands out at 40\%; (ii) prompt sensitivity is sharply non-uniform---the same reasoning prompt reduces Qwen/Mistral hallucinations by $\sim$17 points each but \emph{increases} Llama-3.1's by 17.8 points; (iii) under reasoning prompts, the dominant error type shifts from \lbl{contradiction to evidence} to \lbl{attribute error} (reaching 91.7\% for Qwen), suggesting reasoning trades contradictions for embedded numerical errors; (iv) on TruthfulQA, all four models converge near 83\% under reasoning, indicating misconception-style questions defeat prompt-based mitigation uniformly. We argue that LLM evaluation should report fine-grained type distributions and that prompt-level mitigation must be model-conditioned.
 \end{abstract}
 
 \section{Project Overview (10 points)}
@@ -46,11 +55,11 @@ We present a comparative study of hallucination behavior in four open-weight ins
 
 \paragraph{} Prior work falls into three families. \textit{Model-internal} methods (e.g., SelfCheckGPT) require white-box logits or multiple samples. \textit{Retrieval-grounded} pipelines (e.g., FactScore) decompose answers into atomic claims and verify each. \textit{NLI-based} judges compare a hypothesis (the answer) to a premise (gold passage). All produce a binary or graded verdict but few yield a fine-grained taxonomy of \textit{why} a hallucination occurred, and fewer apply a uniform pipeline across multiple LLMs. The gap we address is \textbf{a single, reproducible pipeline that classifies hallucinations into an interpretable taxonomy and applies uniformly across models, datasets, and prompts.}
 
-\paragraph{} Our pipeline combines DeBERTa-MNLI with score-based heuristics. The NLI judge gives the supported/hallucinated decision and contributes the contradiction-probability score. For finer typing, three additional scores compete: a NER-based entity score, a number-mismatch score gated on entity-correctness, and an evidence-engagement score gated on question type. The argmax type wins; below a 0.5 confidence floor we return \texttt{unsupported\_inference}. Two safety nets handle NLI's known weaknesses: a multi-signal supported-override (token recall + embedding cosine + bidirectional NLI) for verbose-but-correct answers, and a cross-record second pass that flags overconfident-abstention failures by comparing plain and abstain prompt variants for the same question.
+\paragraph{} Our pipeline combines DeBERTa-MNLI with score-based heuristics. The NLI judge gives the supported/hallucinated decision and contributes the contradiction-probability score. For finer typing, three additional scores compete: a NER-based entity score, a number-mismatch score gated on entity-correctness, and an evidence-engagement score gated on question type. The argmax type wins; below a 0.5 confidence floor we return \lbl{unsupported inference}. Two safety nets handle NLI's known weaknesses: a multi-signal supported-override (token recall + embedding cosine + bidirectional NLI) for verbose-but-correct answers, and a cross-record second pass that flags overconfident-abstention failures by comparing plain and abstain prompt variants for the same question.
 
-\paragraph{} We apply this pipeline uniformly to four open-weight LLMs (Phi-4-mini-instruct 3.8B, Mistral-7B-Instruct-v0.3, Qwen2.5-7B-Instruct, Llama-3.1-8B-Instruct) on 500 HotpotQA + 120 TruthfulQA questions $\times$ three prompts (\texttt{plain}, \texttt{abstain}, \texttt{reasoning}), totaling 7{,}440 labeled records. Primary metrics are EM, token-F1, hallucination rate, abstention rate, and the type distribution within hallucinated records.
+\paragraph{} We apply this pipeline uniformly to four open-weight LLMs (Phi-4-mini-instruct 3.8B, Mistral-7B-Instruct-v0.3, Qwen2.5-7B-Instruct, Llama-3.1-8B-Instruct) on 500 HotpotQA + 120 TruthfulQA questions $\times$ three prompts (\lbl{plain}, \lbl{abstain}, \lbl{reasoning}), totaling 7{,}440 labeled records. Primary metrics are EM, token-F1, hallucination rate, abstention rate, and the type distribution within hallucinated records.
 
-\paragraph{} Three headline findings: (1) on HotpotQA \texttt{plain}, three of four models hallucinate at 87--92\%, while Llama-3.1 stands out at 40\%; (2) the same \texttt{reasoning} prompt reduces Mistral's and Qwen's hallucination rates by $\sim$17 points each but \emph{increases} Llama-3.1's by 17.8 points; (3) error \emph{types} shift under reasoning prompts: \texttt{contradiction\_to\_evidence} drops while \texttt{attribute\_error} rises (91.7\% for Qwen), and on TruthfulQA all four models converge near 83\% regardless of model.
+\paragraph{} Three headline findings: (1) on HotpotQA \lbl{plain}, three of four models hallucinate at 87--92\%, while Llama-3.1 stands out at 40\%; (2) the same \lbl{reasoning} prompt reduces Mistral's and Qwen's hallucination rates by $\sim$17 points each but \emph{increases} Llama-3.1's by 17.8 points; (3) error \emph{types} shift under reasoning prompts: \lbl{contradiction to evidence} drops while \lbl{attribute error} rises (91.7\% for Qwen), and on TruthfulQA all four models converge near 83\% regardless of model.
 
 \section{Ideas (10 points)}
 
@@ -58,19 +67,19 @@ We present a comparative study of hallucination behavior in four open-weight ins
 
 HotpotQA includes human-annotated supporting facts---sentence-level pointers to gold passages---which makes the verification problem a textbook NLI task: does the premise (gold evidence) entail the hypothesis (model answer)? We use \texttt{microsoft/deberta-large-mnli} (430M params) as a frozen judge. DeBERTa's disentangled attention outperforms RoBERTa-large on MNLI by $\sim$1.2 points, which translates to roughly 90 fewer mislabels at our scale. Choosing a frozen NLI judge sidesteps both white-box requirements and LLM-as-judge bias, and lets the same judge be applied uniformly across all four models under test.
 
-The main challenge is that NLI mislabels long correct answers as \texttt{neutral}: verbosity dilutes the entailment signal. We address this by (i) constraining the premise to gold supporting sentences only (never distractors), (ii) cleaning prompt prefixes and chat-template role markers from answers before NLI (otherwise the answer field contains the original prompt and ``\texttt{assistant\textbackslash n\textbackslash n}'' tokens), and (iii) layering the multi-signal override of Idea~3 on top.
+The main challenge is that NLI mislabels long correct answers as \lbl{neutral}: verbosity dilutes the entailment signal. We address this by (i) constraining the premise to gold supporting sentences only (never distractors), (ii) cleaning prompt prefixes and chat-template role markers from answers before NLI (otherwise the answer field contains the original prompt and ``\texttt{assistant\textbackslash n\textbackslash n}'' tokens), and (iii) layering the multi-signal override of Idea~3 on top.
 
 \subsection{Idea 2: Score-Based Hallucination Type Classification}
 
-Sequential heuristic chains fail on this task: whichever check fires first wins, even if a later check has stronger signal. Instead, each candidate type produces a score in $[0, 1]$ from independent signals, and we pick the argmax. Below a 0.5 confidence floor, we deliberately return \texttt{unsupported\_inference} rather than force a wrong type.
+Sequential heuristic chains fail on this task: whichever check fires first wins, even if a later check has stronger signal. Instead, each candidate type produces a score in $[0, 1]$ from independent signals, and we pick the argmax. Below a 0.5 confidence floor, we deliberately return \lbl{unsupported inference} rather than force a wrong type.
 
-Each score is gated on a precondition that filters obvious false positives. \textit{Entity} score uses spaCy NER (PERSON/ORG/GPE/etc.) rather than capitalized-word matching, restricting to actual named entities. \textit{Attribute} score is gated on entity-correctness: number mismatches only count in answer sentences containing a confirmed-correct entity, so wrong-entity answers fall through to \texttt{entity\_error} instead. \textit{Multi-hop} score requires the answer to overlap at least 0.2 Jaccard with at least one evidence sentence---a model that invented an answer entirely is \texttt{unsupported\_inference}, not multi-hop. Before this redesign, \texttt{multi\_hop\_reasoning\_error} had an estimated 80\% false-positive rate; after the gates and the score floor, the resulting type distribution carries real interpretive weight.
+Each score is gated on a precondition that filters obvious false positives. \textit{Entity} score uses spaCy NER (PERSON/ORG/GPE/etc.) rather than capitalized-word matching, restricting to actual named entities. \textit{Attribute} score is gated on entity-correctness: number mismatches only count in answer sentences containing a confirmed-correct entity, so wrong-entity answers fall through to \lbl{entity error} instead. \textit{Multi-hop} score requires the answer to overlap at least 0.2 Jaccard with at least one evidence sentence---a model that invented an answer entirely is \lbl{unsupported inference}, not multi-hop. Before this redesign, \lbl{multi-hop reasoning error} had an estimated 80\% false-positive rate; after the gates and the score floor, the resulting type distribution carries real interpretive weight.
 
 \subsection{Idea 3: Multi-Signal Supported Override and Cross-Record Detection}
 
-The supported-override addresses NLI's verbose-correct failure mode. Three independent signals with uncorrelated failure modes compete: \textit{reference recall} (fraction of reference tokens in the answer; verbosity-tolerant), \textit{embedding cosine} (sentence-transformers/all-MiniLM-L6-v2 between answer and reference; captures paraphrase), and \textit{bidirectional NLI} (answer entails reference \textit{and} vice versa). Two of three must agree before flipping a record from hallucinated to supported. For \texttt{neutral}-NLI cases, reference recall above 0.5 alone suffices; for \texttt{contradiction}, we require the full 2-of-3 to avoid suppressing real errors. Thresholds (recall 0.50, cosine 0.60) were tuned on $\sim$1500 spot-checked records, biased toward false-negatives so we never artificially lower hallucination rates.
+The supported-override addresses NLI's verbose-correct failure mode. Three independent signals with uncorrelated failure modes compete: \textit{reference recall} (fraction of reference tokens in the answer; verbosity-tolerant), \textit{embedding cosine} (sentence-transformers/all-MiniLM-L6-v2 between answer and reference; captures paraphrase), and \textit{bidirectional NLI} (answer entails reference \textit{and} vice versa). Two of three must agree before flipping a record from hallucinated to supported. For \lbl{neutral}-NLI cases, reference recall above 0.5 alone suffices; for \lbl{contradiction}, we require the full 2-of-3 to avoid suppressing real errors. Thresholds (recall 0.50, cosine 0.60) were tuned on $\sim$1500 spot-checked records, biased toward false-negatives so we never artificially lower hallucination rates.
 
-The \texttt{overconfident\_abstention\_failure} flag cannot be set per-record---it requires comparing a model's behavior on the same question across two prompt variants. We implement it as a cross-record second pass in \texttt{compute\_metrics.py}: group records by (model, question), and if \texttt{plain} is hallucinated and \texttt{abstain} is correctly abstained, flag the \texttt{plain} record. Isolating this in a separate pass keeps the per-record labeler stateless and the cross-record logic easy to audit.
+The \lbl{overconfident abstention failure} flag cannot be set per-record---it requires comparing a model's behavior on the same question across two prompt variants. We implement it as a cross-record second pass in \texttt{compute\_metrics.py}: group records by (model, question), and if \lbl{plain} is hallucinated and \lbl{abstain} is correctly abstained, flag the \lbl{plain} record. Isolating this in a separate pass keeps the per-record labeler stateless and the cross-record logic easy to audit.
 
 \section{Experimental Setup (10 points)}
 
@@ -80,17 +89,17 @@ Four open-weight instruction-tuned transformers, all run closed-book (question o
 
 \subsection{Dataset}
 
-\textbf{HotpotQA (primary):} 500 questions sampled from the dev split (distractor config, seed 42), each with a short reference answer and human-annotated supporting facts (sentence pointers into gold passages). Models see only the question; supporting facts are reserved for the labeling pipeline. \textbf{TruthfulQA (secondary):} 120 questions stratified by category; lacks supporting facts, so the gold reference itself is used as the NLI premise. Test-set total: 500$\times$3 + 120$\times$3 = 1860 records per model, 7440 across all four. Prompt variants: \texttt{plain} (direct QA), \texttt{abstain} (``If unsure, say I don't know''), \texttt{reasoning} (step-by-step + abstention).
+\textbf{HotpotQA (primary):} 500 questions sampled from the dev split (distractor config, seed 42), each with a short reference answer and human-annotated supporting facts (sentence pointers into gold passages). Models see only the question; supporting facts are reserved for the labeling pipeline. \textbf{TruthfulQA (secondary):} 120 questions stratified by category; lacks supporting facts, so the gold reference itself is used as the NLI premise. Test-set total: 500$\times$3 + 120$\times$3 = 1860 records per model, 7440 across all four. Prompt variants: \lbl{plain} (direct QA), \lbl{abstain} (``If unsure, say I don't know''), \lbl{reasoning} (step-by-step + abstention).
 
 \subsection{Evaluation Metrics}
 
 \textbf{Exact Match}: $\text{EM}(p, r) = \mathbb{1}[\text{normalize}(p) = \text{normalize}(r)]$ (lowercase, strip articles, drop punctuation).
 \textbf{Token F1}: harmonic mean of token precision and recall: $F_1 = \frac{2 \cdot P \cdot R}{P + R}$.
 \textbf{Hallucination rate}: fraction of records where \texttt{hallucination\_type} $\notin$ \{supported, abstained\}.
-\textbf{Abstention rate}: fraction labeled \texttt{abstained}.
+\textbf{Abstention rate}: fraction labeled \lbl{abstained}.
 \textbf{Type distribution}: percent of hallucinated records per taxonomy bucket.
 \textbf{Prompt sensitivity}: $\Delta = \text{Hall}\%_{\text{plain}} - \text{Hall}\%_{\text{reasoning}}$.
-\textbf{Overconfident abstention failure}: cross-record fraction where \texttt{plain} hallucinates while \texttt{abstain} abstains. We additionally do a $\sim$25-example-per-type spot check (Section~\ref{sec:analysis}).
+\textbf{Overconfident abstention failure}: cross-record fraction where \lbl{plain} hallucinates while \lbl{abstain} abstains. We additionally do a $\sim$25-example-per-type spot check (Section~\ref{sec:analysis}).
 
 \section{Results (40 points for implementation and results)}
 \label{sec:results}
@@ -120,34 +129,20 @@ Llama-3.1-8B  & abstain   & 0.008 & 0.024 & 6.0 & 88.4\\
 Llama-3.1-8B  & reasoning & 0.000 & 0.032 & 58.0 & 0.8\\
 \hline
 \end{tabular}
-\caption{HotpotQA results. EM and F1 against reference; Hall\% and Abst\% from our labeling pipeline. The \texttt{abstain} prompt drives near-total abstention in three of four models; only Mistral retains a meaningful answer rate.}
+\caption{HotpotQA results. EM and F1 against reference; Hall\% and Abst\% from our labeling pipeline. The \lbl{abstain} prompt drives near-total abstention in three of four models; only Mistral retains a meaningful answer rate.}
 \label{tab:hall_rate}
 \end{table}
 
 \subsection{Hallucination Type Distribution}
 
-\texttt{contradiction\_to\_evidence} dominates plain prompts (44--73\% across models): when models hallucinate, they typically do so confidently against the gold evidence, not merely uncertainly. Reasoning prompts redistribute errors: \texttt{attribute\_error} rises to 57\% for Mistral and 91.7\% for Qwen.
+\lbl{contradiction to evidence} dominates plain prompts (44--73\% across models): when models hallucinate, they typically do so confidently against the gold evidence, not merely uncertainly. Reasoning prompts redistribute errors: \lbl{attribute error} rises to 57\% for Mistral and 91.7\% for Qwen.
 
-\begin{table}[h!]
+\begin{figure}[h!]
 \centering
-\scriptsize
-\begin{tabular}{lll}
-\hline
-Model & Prompt & Type breakdown (\%)\\
-\hline
-Phi-4-mini   & plain     & cont=68.0, mhop=14.6, attr=11.4, ent=5.9\\
-Phi-4-mini   & reasoning & cont=44.0, attr=29.3, mhop=19.6, ent=7.1\\
-Mistral-7B   & plain     & cont=48.3, mhop=23.2, attr=18.6, ent=10.0\\
-Mistral-7B   & reasoning & attr=57.0, mhop=26.5, cont=11.4, ent=5.0\\
-Qwen2.5-7B   & plain     & cont=48.1, attr=28.1, mhop=15.6, ent=8.1\\
-Qwen2.5-7B   & reasoning & attr=91.7, cont=8.1, mhop=0.3\\
-Llama-3.1-8B & plain     & cont=60.7, mhop=21.4, attr=10.4, ent=7.5\\
-Llama-3.1-8B & reasoning & attr=40.7, cont=29.0, mhop=24.1, ent=6.2\\
-\hline
-\end{tabular}
-\caption{Hallucination type distribution per (model, prompt) on HotpotQA, as percentages of the hallucinated subset. \texttt{cont}=contradiction, \texttt{attr}=attribute, \texttt{ent}=entity, \texttt{mhop}=multi-hop. Abstain rows omitted for space.}
-\label{tab:type_breakdown}
-\end{table}
+\includegraphics[width=\columnwidth]{plots/report_hallucination_rate_by_type.png}
+\caption{Hallucination rate and type composition per model and prompt on HotpotQA. Bar height = total hallucination rate; segments show the share of each error type. Suffixes \texttt{P}/\texttt{R}/\texttt{A} indicate plain / reasoning / abstain prompts.}
+\label{fig:hall_by_type}
+\end{figure}
 
 \subsection{Prompt Sensitivity and Cross-Dataset}
 
@@ -173,26 +168,42 @@ Llama-3.1-8B  & 40.2 & 58.0 & \textbf{+17.8}   & 92.5 & 83.3\\
 
 \subsection{Headline Findings}
 
-(1) Aggregate rates are model-similar (87--92\%) on HotpotQA \texttt{plain}, with Llama-3.1 the outlier at 40\%. (2) Prompt sensitivity is sharply non-uniform: reasoning helps Mistral/Qwen, marginally helps Phi, hurts Llama. (3) Failure modes shift under reasoning: contradiction drops, attribute error rises---models become more careful about high-level facts but accumulate small numerical errors during elaboration. (4) Misconception questions defeat reasoning prompts uniformly across models on TruthfulQA.
+(1) Aggregate rates are model-similar (87--92\%) on HotpotQA \lbl{plain}, with Llama-3.1 the outlier at 40\%. (2) Prompt sensitivity is sharply non-uniform: reasoning helps Mistral/Qwen, marginally helps Phi, hurts Llama. (3) Failure modes shift under reasoning: contradiction drops, attribute error rises---models become more careful about high-level facts but accumulate small numerical errors during elaboration. (4) Misconception questions defeat reasoning prompts uniformly across models on TruthfulQA.
 
 \section{Analysis and Discussion (25 points)}
 \label{sec:analysis}
 
 We focus on \textbf{Mistral-7B}, the model with the clearest beneficial reasoning-prompt response (17-point drop) and the most balanced abstention behavior. Manual review of $\sim$25 hallucinations per type surfaces four recurring failure patterns: (1) \textit{confident substitution}---Mistral plain answers ``The Public Theater'' when asked the original name of Joseph Papp's organization (gold: New York Shakespeare Festival, the institution's earlier name); (2) \textit{over-elaboration with embedded fabrications}---Mistral reasoning correctly says ``Woolworth Building was built first'' but inserts ``completed in 1913'' (gold: 1910--1912); (3) \textit{confused chaining on bridge questions}---correct identification of an intermediate entity but wrong second-hop property; (4) \textit{hedged abstention on easy facts}---refusing questions whose evidence contains an unambiguous answer (e.g., D-Day for the Normandy operation).
 
-\paragraph{H1: Reasoning prompts convert contradictions into attribute errors via verbosity.} Mistral's \texttt{contradiction\_to\_evidence} drops from 48.3\% to 11.4\% under reasoning while \texttt{attribute\_error} rises from 18.6\% to 57.0\%. Step-by-step reasoning improves high-level structure but lengthens the response, introducing extra numerical claims that miss the evidence (the Woolworth example above). Cap \texttt{max\_tokens} at 64 to test the verbosity mechanism.
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\columnwidth]{plots/report_type_shifts.png}
+\caption{Mistral-7B hallucination type distribution shifts across prompts. Reasoning compresses contradiction errors into attribute errors; abstain shifts mass toward multi-hop and away from contradiction.}
+\label{fig:type_shifts}
+\end{figure}
+
+
+\paragraph{H1: Reasoning prompts convert contradictions into attribute errors via verbosity.} Mistral's \lbl{contradiction to evidence} drops from 48.3\% to 11.4\% under reasoning while \lbl{attribute error} rises from 18.6\% to 57.0\%. Step-by-step reasoning improves high-level structure but lengthens the response, introducing extra numerical claims that miss the evidence (the Woolworth example above). Cap \texttt{max\_tokens} at 64 to test the verbosity mechanism.
 
 \paragraph{H2: Bridge questions concentrate multi-hop errors.} HotpotQA's \texttt{bridge} questions require both identifying an intermediate entity \textit{and} retrieving a property of it---two failure points. Llama plain answers ``I'm not familiar with Pak Sao'' on a bridge question whose Wing-Chun hop is the bottleneck. The labeled records carry a \texttt{type} field; a short filter would separate bridge vs.\ comparison rates.
 
-\paragraph{H3: Llama-3.1's anomalous prompt sensitivity is an instruction-following difference, not a knowledge difference.} Llama hallucinates 40\% on \texttt{plain} (vs.\ 87--92\% for the others) but \emph{rises} to 58\% on \texttt{reasoning}. Plain outputs frequently hedge (``I don't have information on...,'' caught by \texttt{ABSTAIN\_PHRASES}); reasoning outputs are multi-paragraph elaborations where the new hallucinations originate. Llama appears to read ``reason step-by-step'' as ``produce a longer answer'' rather than ``be more cautious.''
+\paragraph{H3: Llama-3.1's anomalous prompt sensitivity is an instruction-following difference, not a knowledge difference.} Llama hallucinates 40\% on \lbl{plain} (vs.\ 87--92\% for the others) but \emph{rises} to 58\% on \lbl{reasoning}. Plain outputs frequently hedge (``I don't have information on...,'' caught by \texttt{ABSTAIN\_PHRASES}); reasoning outputs are multi-paragraph elaborations where the new hallucinations originate. Llama appears to read ``reason step-by-step'' as ``produce a longer answer'' rather than ``be more cautious.''
 
-\paragraph{Pipeline limitations.} The spot-check surfaced two labeling weaknesses worth recording: (1) when gold evidence contains ambiguous referents (``the film features...'' detached from the article title), DeBERTa cannot attribute the sentence to its source entity, occasionally returning \texttt{neutral} on supported records; prepending each evidence sentence with its title is a natural fix. (2) \texttt{multi\_hop\_reasoning\_error} retains some false-positive rate on verbose-but-correct answers; a stronger NER+coreference model or a GPT-4 tiebreaker on low-score cases would reduce it.
+\paragraph{Pipeline limitations.} The spot-check surfaced two labeling weaknesses worth recording: (1) when gold evidence contains ambiguous referents (``the film features...'' detached from the article title), DeBERTa cannot attribute the sentence to its source entity, occasionally returning \lbl{neutral} on supported records; prepending each evidence sentence with its title is a natural fix. (2) \lbl{multi-hop reasoning error} retains some false-positive rate on verbose-but-correct answers; a stronger NER+coreference model or a GPT-4 tiebreaker on low-score cases would reduce it.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\columnwidth]{plots/report_overconfident_abstention.png}
+\caption{Overconfident abstention failures: questions where the plain prompt hallucinated but the abstain prompt correctly refused. Phi-4-mini and Qwen2.5 show the largest gaps between their plain and abstain behavior.}
+\label{fig:overconfident}
+\end{figure}
+
 
 \paragraph{Takeaways.} Three points consolidate. First, prompt effects are mediated by \textit{response length}: reasoning prompts trade outright contradictions for embedded numerical errors. Second, prompt strategies that work on multi-hop factoid questions (HotpotQA) do not transfer to misconception-style questions (TruthfulQA), where all models converge near 83\%. Third, model-specific instruction-following style matters more than model size in determining how prompts shape hallucination behavior---hallucination-mitigation prompts must be model-conditioned rather than uniformly applied.
 
 \section{Code and Demo (5 points)}
 
-\paragraph{Repository.} \url{https://github.com/hpaliwal8/hdc-rag} (TODO: confirm URL). Original code; third-party libraries are \texttt{transformers}, \texttt{datasets}, \texttt{sentence-transformers}, \texttt{spacy}, \texttt{seaborn}/\texttt{matplotlib}.
+\paragraph{Repository.} \url{https://github.com/hpaliwal8/hallu-detection-type-classification} (TODO: confirm URL). Original code; third-party libraries are \texttt{transformers}, \texttt{datasets}, \texttt{sentence-transformers}, \texttt{spacy}, \texttt{seaborn}/\texttt{matplotlib}.
 
 \paragraph{Key files.} Inference: \code{scripts/run_experiments.py}. Cleaning: \code{scripts/clean_outputs.py}. Labeling: \code{scripts/label_outputs.py} (calls \code{src/labeling/nli.py}, \code{src/labeling/heuristics.py} with score-based \code{classify_hallucination_type()} and the multi-signal \code{is_supported_by_signals()}, plus \code{src/labeling/embeddings.py}, \code{src/labeling/entities.py}, \code{src/labeling/evidence.py}). Metrics: \code{scripts/compute_metrics.py} with \code{flag_overconfident_abstention()}. Aggregation: \code{scripts/type_breakdown.py}. Plots: \code{scripts/plot_results.py}.
 
@@ -206,11 +217,11 @@ We focus on \textbf{Mistral-7B}, the model with the clearest beneficial reasonin
 
 \section{Learning Outcomes}
 
-\paragraph{Single classifiers need independent rescue paths.} Off-the-shelf DeBERTa-MNLI mislabels verbose-but-correct answers as \texttt{neutral}, and our multi-signal override (Idea 3) emerged only after manual false-positive review. The lesson generalizes: any classifier in a labeling pipeline benefits from an independent path that fires on its known weakness.
+\paragraph{Single classifiers need independent rescue paths.} Off-the-shelf DeBERTa-MNLI mislabels verbose-but-correct answers as \lbl{neutral}, and our multi-signal override (Idea 3) emerged only after manual false-positive review. The lesson generalizes: any classifier in a labeling pipeline benefits from an independent path that fires on its known weakness.
 
-\paragraph{Score-based dispatch beats sequential heuristics; input cleaning beats both.} Our first \texttt{classify\_hallucination\_type} used \texttt{if/elif/else} and produced an estimated 80\% false-positive rate on \texttt{multi\_hop\_reasoning\_error}; replacing the chain with score competition plus a 0.5 floor was a small refactor with disproportionate gains. But the largest single improvement of the whole project came from stripping prompt prefixes and chat-template role markers from answers via \texttt{clean\_outputs.py}---Mistral's supported count jumped from 119 to 416, larger than any subsequent algorithmic improvement. Audit pipeline inputs before tuning the model in the middle.
+\paragraph{Score-based dispatch beats sequential heuristics; input cleaning beats both.} Our first \texttt{classify\_hallucination\_type} used \texttt{if/elif/else} and produced an estimated 80\% false-positive rate on \lbl{multi-hop reasoning error}; replacing the chain with score competition plus a 0.5 floor was a small refactor with disproportionate gains. But the largest single improvement of the whole project came from stripping prompt prefixes and chat-template role markers from answers via \texttt{clean\_outputs.py}---Mistral's supported count jumped from 119 to 416, larger than any subsequent algorithmic improvement. Audit pipeline inputs before tuning the model in the middle.
 
-\paragraph{Aggregate metrics hide model differences; prompt sensitivity is an interaction effect.} Three of four models hallucinate at 87--92\% on HotpotQA \texttt{plain}---indistinguishable on a binary metric---but the type distribution reveals they fail differently. Similarly, ``add chain-of-thought instructions'' is not universally beneficial: the same reasoning prompt helps Qwen/Mistral by $\sim$17 points but hurts Llama-3.1 by 17.8 points. Comparative LLM evaluation should report fine-grained type distributions and per-model prompt sensitivity, not aggregate rates alone.
+\paragraph{Aggregate metrics hide model differences; prompt sensitivity is an interaction effect.} Three of four models hallucinate at 87--92\% on HotpotQA \lbl{plain}---indistinguishable on a binary metric---but the type distribution reveals they fail differently. Similarly, ``add chain-of-thought instructions'' is not universally beneficial: the same reasoning prompt helps Qwen/Mistral by $\sim$17 points but hurts Llama-3.1 by 17.8 points. Comparative LLM evaluation should report fine-grained type distributions and per-model prompt sensitivity, not aggregate rates alone.
 
 \section{Contributions}
 

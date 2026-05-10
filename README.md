@@ -1,4 +1,4 @@
-# HDC-RAG (Research Pivot)
+# HalluDetectionTypeClassification
 
 Comparative hallucination analysis across multiple models using HotpotQA (primary) and TruthfulQA (stress test).
 See `PROJECT_PLAN.md`, `WEEKLY_PLAN.md`, and `TODO.md` for the research design.
