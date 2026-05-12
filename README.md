@@ -3,14 +3,52 @@
 Comparative hallucination analysis across multiple models using HotpotQA (primary) and TruthfulQA (stress test).
 See `PROJECT_PLAN.md`, `WEEKLY_PLAN.md`, and `TODO.md` for the research design.
 
+> **Project rename note:** This repository was previously named `hdc-rag` / `HDC-RAG`. The GitHub URL was renamed in May 2026; old clone URLs continue to redirect. If you have a local clone at `~/source/hdc-rag/`, see the "Renaming the local clone" section below.
+
+## Requirements
+
+- **Python 3.12** (the pinned `spacy` and `thinc` versions only have prebuilt wheels for 3.10–3.14). Confirm with `python3.12 --version` before creating the venv.
+- macOS, Linux, or WSL.
+- For inference: NVIDIA T4 (16 GB, with 4-bit quantization) or A100 (recommended).
+
 ## Quick Start
 
-1. Create a virtualenv and install deps:
+1. Create a virtualenv **explicitly with Python 3.12** and install deps:
 
 ```bash
-python -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+
+# Sanity check — must print 3.12.x
+python --version
+
+# Use the venv's own pip to avoid system-pip resolving deps for an older Python
+.venv/bin/python -m pip install --upgrade pip setuptools wheel
+.venv/bin/python -m pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+```
+
+> **Why explicit `python3.12`?** Running `python3 -m venv .venv` may pick up the system Python (often 3.9 on macOS), which causes `spacy`/`thinc` install to fail with `No matching distribution found for thinc>=8.3.12` because those versions require Python 3.10+. Always create the venv with `python3.12`.
+
+### Renaming the local clone
+
+If you previously cloned the repo at `~/source/hdc-rag/`, rename and recreate the venv:
+
+```bash
+cd ~/source
+mv hdc-rag HalluDetectionTypeClassification
+cd HalluDetectionTypeClassification
+
+# Old .venv has hardcoded /hdc-rag paths — must recreate
+rm -rf .venv
+python3.12 -m venv .venv
+source .venv/bin/activate
+.venv/bin/python -m pip install --upgrade pip setuptools wheel
+.venv/bin/python -m pip install -r requirements.txt
+python -m spacy download en_core_web_sm
+
+# Update git remote
+git remote set-url origin https://github.com/hpaliwal8/hallu-detection-type-classification.git
 ```
 
 2. Download HotpotQA (primary) and create a dataset file:
